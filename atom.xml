@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Hexo</title>
+  
+  
+  <link href="http://example.com/atom.xml" rel="self"/>
+  
+  <link href="http://example.com/"/>
+  <updated>2020-10-11T05:37:04.664Z</updated>
+  <id>http://example.com/</id>
+  
+  <author>
+    <name>Elliot z.b</name>
+    
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>ReentrantLock源码解析</title>
+    <link href="http://example.com/2020/10/11/ReentrantLock%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/"/>
+    <id>http://example.com/2020/10/11/ReentrantLock%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/</id>
+    <published>2020-10-11T01:44:42.000Z</published>
+    <updated>2020-10-11T05:37:04.664Z</updated>
+    
+    
+    
+    
+    
+    <category term="源码" scheme="http://example.com/tags/%E6%BA%90%E7%A0%81/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>LeetCode239-滑动窗口最大值</title>
+    <link href="http://example.com/2020/10/11/LeetCode239-%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3%E6%9C%80%E5%A4%A7%E5%80%BC/"/>
+    <id>http://example.com/2020/10/11/LeetCode239-%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3%E6%9C%80%E5%A4%A7%E5%80%BC/</id>
+    <published>2020-10-11T01:35:24.000Z</published>
+    <updated>2020-10-11T01:40:43.209Z</updated>
+    
+    <content type="html"><![CDATA[<p>给定一个数组 nums，有一个大小为 k 的滑动窗口从数组的最左侧移动到数组的最右侧。你只可以看到在滑动窗口内的 k 个数字。滑动窗口每次只向右移动一位。</p><p>返回滑动窗口中的最大值。</p><p>示例:</p><p>输入: nums = [1,3,-1,-3,5,3,6,7], 和 k = 3</p><p>输出: [3,3,5,5,6,7]</p><p>这道题两种思路，第一种思路就是暴力法，一开始截取数组中k个数，循环计算最大值，依次类推。这种办法的复杂度是N的平方，而且空间复杂度也比较高。</p><p>这种办法肯定不是面试官想要听的，因此就要使用其他一种办法。</p><p>思路就是，先申明一个queue，循环输入，每输入一个，就判断跟前面的比是不是最大的，如果不是，就插入到后面，如果是，就把前面的删除。然后数据输入达到k个值，就开始加queue中的第一个数据到结果中。</p><p>实际实现时，注意下面两点：</p><p>(1)每次在队列末尾插入数据时，保证前面的数都要比它大，否则将前面的数都删除。</p><p>(2)在window中应该记录数据的下标，而不是数据的实际值，否则在清理过期数据时，会判断不出来是否该把头元素删除。</p><p>代码：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">public int[] maxSlidingWindow(int[] nums, int k) &#123;</span><br><span class="line">    if(null &#x3D;&#x3D; nums || nums.length &#x3D;&#x3D; 0 || k&#x3D;&#x3D;0)&#123;</span><br><span class="line">        return new int[0];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    Queue&lt;Integer&gt; window &#x3D; new ArrayDeque&lt;&gt;();</span><br><span class="line">    List&lt;Integer&gt; res &#x3D; new ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    for(int i&#x3D;0;i&lt;nums.length;i++)&#123;</span><br><span class="line">        if (i&gt;&#x3D;k&amp;&amp;window.peek()&lt;&#x3D;i-k)&#123;</span><br><span class="line">            window.poll();</span><br><span class="line">        &#125;</span><br><span class="line">        while (window.size()!&#x3D;0 &amp;&amp; nums[((ArrayDeque&lt;Integer&gt;) window).peekLast()] &lt;&#x3D; nums[i])&#123;</span><br><span class="line">            ((ArrayDeque&lt;Integer&gt;) window).pollLast();</span><br><span class="line">        &#125;</span><br><span class="line">        window.add(i);</span><br><span class="line">        if (i&gt;&#x3D;k-1)&#123;</span><br><span class="line">            res.add(nums[window.peek()]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    return res.stream().mapToInt(Integer::valueOf).toArray();</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;p&gt;给定一个数组 nums，有一个大小为 k 的滑动窗口从数组的最左侧移动到数组的最右侧。你只可以看到在滑动窗口内的 k 个数字。滑动窗口每次只向右移动一位。&lt;/p&gt;
+&lt;p&gt;返回滑动窗口中的最大值。&lt;/p&gt;
+&lt;p&gt;示例:&lt;/p&gt;
+&lt;p&gt;输入: nums = [1,3,-1,-3</summary>
+      
+    
+    
+    
+    
+    <category term="Algorithm" scheme="http://example.com/tags/Algorithm/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Hello World</title>
+    <link href="http://example.com/2020/10/10/hello-world/"/>
+    <id>http://example.com/2020/10/10/hello-world/</id>
+    <published>2020-10-10T13:59:26.571Z</published>
+    <updated>2020-10-10T13:59:26.571Z</updated>
+    
+    <content type="html"><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p><h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p><h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p><h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p><h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;p&gt;Welcome to &lt;a href=&quot;https://hexo.io/&quot;&gt;Hexo&lt;/a&gt;! This is your very first post. Check &lt;a href=&quot;https://hexo.io/docs/&quot;&gt;documentation&lt;/a&gt; for</summary>
+      
+    
+    
+    
+    
+  </entry>
+  
+</feed>
